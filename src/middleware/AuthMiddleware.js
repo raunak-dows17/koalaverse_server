@@ -12,6 +12,7 @@ function AuthMiddleware(req, res, next) {
     req.userId = decoded.userId;
     next();
   } catch (error) {
+    console.error(error?.message);
     res.status(401).json({
       error: "Access Denied",
     });
