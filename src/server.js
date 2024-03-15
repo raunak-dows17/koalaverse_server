@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");
 require("dotenv").config();
 require("../config/db");
 const userRouter = require("./routes/userRoutes");
@@ -10,6 +11,7 @@ app.get("/", (req, res) => {
   res.send("Welcome to Taleverse's Serverse");
 });
 
+app.use(cors());
 app.use(express.json());
 app.use("/api/auth", userRouter);
 
