@@ -1,12 +1,13 @@
 const User = require("../model/User");
 const bcrypt = require("bcrypt");
-// const { json } = require("body-parser");
 const jwt = require("jsonwebtoken");
+const cloudinary = require("../../config/cloudinary");
+const streamify = require("streamifier");
 
 const UserController = {
   userRegister: async (req, res) => {
     try {
-      const { image, name, username, email, password, phoneNumber } = req.body;
+      const { name, username, email, password, phoneNumber } = req.body;
       const existingEmail = await User.findOne({ email });
       const existingUsername = await User.findOne({ username });
 
@@ -15,8 +16,24 @@ const UserController = {
       } else {
         const hashedPassword = await bcrypt.hash(password, 7);
 
+        const imageBuffer = req.file.buffer;
+        const uploadOptions = {
+          folder: "tv_profileImages",
+          public_id: username,
+        };
+        const uploadedImage = await new Promise((resolve, reject) => {
+          const uploadStream = cloudinary.uploader.upload_stream(
+            uploadOptions,
+            (error, result) => {
+              if (error) throw new Error(error);
+              else return resolve(result);
+            }
+          );
+          streamify.createReadStream(imageBuffer).pipe(uploadStream);
+        });
+
         const newUser = new User({
-          image,
+          profileImage: uploadedImage.secure_url,
           name,
           username,
           email,
@@ -162,8 +179,30 @@ const UserController = {
           message: "User not found",
         });
       } else {
+        if (user?.profileImage) {
+          await cloudinary.api.delete_resources(`tv_profileImages/${_id}`);
+        }
+        const imageBuffer = req.file.buffer;
+        const uploadOptions = {
+          folder: "tv_profileImages",
+          public_id: user?.username,
+        };
+        const uploadedImage = await new Promise((resolve, reject) => {
+          const uploadStream = cloudinary.uploader.upload_stream(
+            uploadOptions,
+            (error, result) => {
+              if (error) throw new Error(error);
+              else return resolve(result);
+            }
+          );
+          streamify.createReadStream(imageBuffer).pipe(uploadStream);
+        });
+
+        const profileImage = uploadedImage.secure_url;
+
         const updatedUser = {
           name: name ? name : user.name,
+          profileImage: profileImage ? profileImage : user.profileImage,
           phoneNumber: phoneNumber ? phoneNumber : user.phoneNumber,
         };
 
