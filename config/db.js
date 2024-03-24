@@ -1,10 +1,8 @@
 const mongoose = require("mongoose");
 
-const conn = mongoose.connect(
-  process.env.MONGODB_URI || "mongodb://localhost:27017/"
-);
+mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost:27017/");
 
-const connection = mongoose.connection;
+const { connection } = mongoose;
 
 connection.on("error", (err) => console.error(err));
 

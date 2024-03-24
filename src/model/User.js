@@ -23,6 +23,18 @@ const userSchema = mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    stories: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: "storyData",
+      },
+    ],
+    contributions: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: "contributionData",
+      },
+    ],
   },
   {
     timestamps: true,

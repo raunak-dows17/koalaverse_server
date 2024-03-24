@@ -12,7 +12,7 @@ const UserController = {
       const existingUsername = await User.findOne({ username });
 
       if (existingEmail || existingUsername) {
-        res.status(401).send("User already exists");
+        return res.status(401).send("User already exists");
       } else {
         const hashedPassword = await bcrypt.hash(password, 7);
 
@@ -48,14 +48,14 @@ const UserController = {
 
         const token = jwt.sign(payload, process.env.JWT_SECRET);
 
-        res.status(201).send({
+        return res.status(201).send({
           message: "User registered successfully",
           token,
         });
       }
     } catch (error) {
       console.error(error?.message);
-      res.status(500).send({
+      return res.status(500).send({
         message: "Internal Server Error",
       });
     }
@@ -66,14 +66,14 @@ const UserController = {
       const { username, password } = req.body;
       const user = await User.findOne({ username });
       if (!user) {
-        res.status(404).json({
+        return res.status(404).json({
           message: "User not found",
         });
       } else {
         const matchPassword = await bcrypt.compare(password, user.password);
 
         if (!matchPassword) {
-          res.status(401).json({
+          return res.status(401).json({
             message: "Invalid Username or Password",
           });
         } else {
@@ -83,7 +83,7 @@ const UserController = {
 
           const token = jwt.sign(payload, process.env.JWT_SECRET);
 
-          res.status(201).json({
+          return res.status(201).json({
             message: "Logged in successfully",
             token,
           });
@@ -91,10 +91,12 @@ const UserController = {
       }
     } catch (error) {
       console.error(error);
-      res.status(500),
+      return (
+        res.status(500),
         json({
           message: "Internal Server Error",
-        });
+        })
+      );
     }
   },
 
@@ -102,7 +104,9 @@ const UserController = {
     try {
       const _id = req.userId;
 
-      const user = await User.findOne({ _id }).select("-password");
+      const user = await User.findOne({ _id })
+        .select("-password")
+        .populate("stories");
       if (!user || !user.isActive) {
         return res.status(404).json({
           message: "User not found",
@@ -112,7 +116,7 @@ const UserController = {
       }
     } catch (error) {
       console.error(error);
-      res.status(500).json({
+      return res.status(500).json({
         message: "Internal Server Error",
       });
     }
@@ -120,8 +124,8 @@ const UserController = {
 
   checkUsername: async (req, res) => {
     try {
-      const input = req.query.username;
-      const user = await User.findOne({ username: input });
+      const { username } = req.query;
+      const user = await User.findOne({ username });
       if (user.username) {
         return res.json({
           message: "Username already taken",
@@ -141,13 +145,10 @@ const UserController = {
 
   checkEmail: async (req, res) => {
     try {
-      const input = req.query.email;
-      const user = await User.findOne({ email: input });
-      if (
-        !input.includes("@") ||
-        !input.includes(".") ||
-        !input.includes("mail")
-      ) {
+      const { email } = req.query;
+      const user = await User.findOne({ email });
+      const regex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g;
+      if (!regex.test(email)) {
         return res.json({
           message: "Invalid email address",
         });
@@ -175,7 +176,7 @@ const UserController = {
       const user = await User.findOne({ _id });
 
       if (!user) {
-        res.status(404).json({
+        return res.status(404).json({
           message: "User not found",
         });
       } else {
@@ -207,13 +208,13 @@ const UserController = {
         };
 
         await User.findByIdAndUpdate(_id, updatedUser);
-        res.status(201).json({
+        return res.status(201).json({
           message: "User updated successfully",
         });
       }
     } catch (error) {
       console.error(error);
-      res.status(500).json({
+      return res.status(500).json({
         message: "Internal server error",
       });
     }
