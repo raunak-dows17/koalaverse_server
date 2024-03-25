@@ -187,19 +187,31 @@ const StoryController = {
       const { title, content } = req.body;
       const { userId } = req;
 
-      const user = await User.findOne({ userId });
+      const user = await User.findById(userId);
+      const story = await Story.findById(storyId);
 
       if (!user) {
-        return res.status(401).json({
-          message: "You need to login to post a story",
+        return res.status(404).json({
+          message: "You need to login to update a story",
         });
       }
 
-      let storyContent;
-      if (typeof content === "string") {
-        storyContent = [{ text: content, author: userId }];
-      } else if (Array.isArray(content)) {
-        storyContent = content.map((text) => ({ text, author: userId }));
+      if (!story) {
+        return res.status(404).json({
+          message: "No story found",
+        });
+      }
+
+      if (String(userId) !== String(story.author)) {
+        return res.status(403).json({
+          message: "You cannot update this story",
+        });
+      }
+
+      let updatedContent = story.content;
+
+      if (Array.isArray(content)) {
+        updatedContent = [...updatedContent, ...content];
       } else {
         return res.status(400).json({
           message: "Invalid content format",
@@ -208,19 +220,60 @@ const StoryController = {
 
       await Story.findByIdAndUpdate(storyId, {
         title,
-        content: storyContent,
+        content: updatedContent,
         author: user,
-      });
-
-      await User.findByIdAndUpdate(userId, {
-        $push: {
-          stories: newStory,
-        },
       });
 
       return res.status(201).json({
         message: "Story updated successfully",
         storyId,
+      });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({
+        message: "Internal server error",
+      });
+    }
+  },
+
+  markAsCompleted: async (req, res) => {
+    try {
+      const { storyId } = req.params;
+      const { userId } = req;
+
+      const story = await Story.findById(storyId);
+      const user = await User.findById(userId);
+
+      if (!user) {
+        return res.status(404).json({
+          message: "User not found",
+        });
+      }
+
+      if (!story) {
+        return res.status(404).json({
+          message: "Story not found",
+        });
+      }
+
+      if (story.author !== userId) {
+        return res.status(403).json({
+          message: "You are not authorized mark as complete on this story",
+        });
+      }
+
+      if (story.isCompleted) {
+        story.isCompleted = false;
+        story.save();
+      } else {
+        story.isCompleted = true;
+        story.save();
+      }
+
+      return res.status(200).json({
+        message: story.isCompleted
+          ? "marked as uncompleted successfully"
+          : "marked as completed successfully",
       });
     } catch (error) {
       console.error(error);

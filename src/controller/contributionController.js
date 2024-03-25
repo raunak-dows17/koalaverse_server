@@ -23,6 +23,12 @@ const ContributionController = {
         });
       }
 
+      if (story.isCompleted) {
+        return res.status(400).json({
+          message: "You cannot contribute on a completed story",
+        });
+      }
+
       const newContribution = new Contributions({
         content,
         storyFor: story,
