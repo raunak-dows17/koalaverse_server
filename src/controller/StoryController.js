@@ -19,6 +19,13 @@ const StoryController = {
               select: "name username",
             },
           ],
+        })
+        .populate({
+          path: "content",
+          populate: {
+            path: "author",
+            select: "name username",
+          },
         });
 
       return res.status(200).json({
@@ -104,6 +111,13 @@ const StoryController = {
               select: "name username",
             },
           ],
+        })
+        .populate({
+          path: "content",
+          populate: {
+            path: "author",
+            select: "name username",
+          },
         });
 
       if (!story) {
@@ -208,10 +222,21 @@ const StoryController = {
         });
       }
 
-      let updatedContent = story.content;
+      let updatedContent;
 
       if (Array.isArray(content)) {
-        updatedContent = [...updatedContent, ...content];
+        const existingContent = story.content.map(({ text, author }) => ({
+          text,
+          author,
+        }));
+
+        updatedContent = content.map((item, index) => ({
+          text: item.text,
+          author:
+            existingContent[index].author === null
+              ? existingContent[index].author
+              : userId,
+        }));
       } else {
         return res.status(400).json({
           message: "Invalid content format",
@@ -221,7 +246,6 @@ const StoryController = {
       await Story.findByIdAndUpdate(storyId, {
         title,
         content: updatedContent,
-        author: user,
       });
 
       return res.status(201).json({
@@ -283,7 +307,58 @@ const StoryController = {
     }
   },
 
-  deleteStory: async (req, res) => {},
+  deleteStory: async (req, res) => {
+    try {
+      const { storyId } = req.params;
+      const { userId } = req;
+
+      const story = await Story.findById(storyId);
+      const user = await User.findById(userId);
+
+      if (!user) {
+        return res.status(404).json({
+          message: "User not found",
+        });
+      }
+
+      if (!story) {
+        return res.status(404).json({
+          message: "Story not found",
+        });
+      }
+
+      if (String(story.author) !== String(userId)) {
+        return res.status(403).json({
+          message: "You cannot delete this story",
+        });
+      }
+
+      const contributions = story.contributions;
+
+      await Story.findByIdAndDelete(storyId);
+
+      contributions.forEach(
+        async (contribution) =>
+          await Contributions.findByIdAndDelete(contribution._id)
+      );
+
+      for (const contribution of contributions) {
+        if (user) {
+          user.contribution.pull(contribution._id);
+          await user.save();
+        }
+      }
+
+      return res.status(200).json({
+        message: "Story deleted successfully",
+      });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({
+        message: "Internal server error",
+      });
+    }
+  },
 };
 
 module.exports = StoryController;

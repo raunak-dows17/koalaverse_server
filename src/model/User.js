@@ -35,6 +35,12 @@ const userSchema = mongoose.Schema(
         ref: "contributionData",
       },
     ],
+    notifications: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: "notificationData",
+      },
+    ],
   },
   {
     timestamps: true,
