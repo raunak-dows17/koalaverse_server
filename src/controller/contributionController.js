@@ -79,11 +79,11 @@ const ContributionController = {
         },
         {
           path: "author",
-          select: "name username",
+          select: "name username profileImage",
         },
         {
           path: "votes",
-          select: "name username",
+          select: "name username profileImage",
         },
       ]);
 

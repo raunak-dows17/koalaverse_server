@@ -8,15 +8,15 @@ const StoryController = {
       const stories = await Story.find({})
         .populate({
           path: "author",
-          select: "name username",
+          select: "name username profileImage",
         })
         .populate({
           path: "contributions",
           populate: [
-            { path: "author", select: "name username" },
+            { path: "author", select: "name username profileImage" },
             {
               path: "votes",
-              select: "name username",
+              select: "name username profileImage",
             },
           ],
         })
@@ -24,7 +24,7 @@ const StoryController = {
           path: "content",
           populate: {
             path: "author",
-            select: "name username",
+            select: "name username profileImage",
           },
         });
 
@@ -97,18 +97,18 @@ const StoryController = {
       const story = await Story.findById(_id)
         .populate({
           path: "author",
-          select: "name username",
+          select: "name username profileImage",
         })
         .populate({
           path: "contributions",
           populate: [
             {
               path: "author",
-              select: "name username",
+              select: "name username profileImage",
             },
             {
               path: "votes",
-              select: "name username",
+              select: "name username profileImage",
             },
           ],
         })
@@ -116,7 +116,7 @@ const StoryController = {
           path: "content",
           populate: {
             path: "author",
-            select: "name username",
+            select: "name username profileImage",
           },
         });
 
