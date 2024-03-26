@@ -125,17 +125,19 @@ const ContributionController = {
       }
 
       if (contribution.votes.includes(userId)) {
-        return res.status(400).json({
-          message: "User have already voted to this contribution",
-        });
+        contribution.voteCount -= 1;
+        contribution.votes.pop(userId);
+        await contribution.save();
+      } else {
+        contribution.voteCount += 1;
+        contribution.votes.push(userId);
+        await contribution.save();
       }
 
-      contribution.voteCount += 1;
-      contribution.votes.push(userId);
-      await contribution.save();
-
       return res.status(200).json({
-        message: "vote recorded successfully",
+        message: contribution.votes.includes(userId)
+          ? "vote removed successfully"
+          : "vote recorded successfully",
         voteCount: contribution.voteCount,
       });
     } catch (error) {
@@ -198,6 +200,9 @@ const ContributionController = {
 
       const user = await User.findById(userId);
       const contribution = await Contributions.findById(contributionId);
+      const story = await Contributions.findById(contribution.storyFor);
+
+      console.log(story);
 
       if (!user) {
         return res.status(404).json({
@@ -218,7 +223,8 @@ const ContributionController = {
       }
 
       await Contributions.findByIdAndDelete(contributionId);
-      user.contribution.pop(contributionId);
+      user.contributions.pop(contributionId);
+      story.contributions.pop(contributionId);
 
       return res.status(200).json({
         message: "Contribution deleted successfully",

@@ -13,7 +13,7 @@ router.post(
 
 router.post("/login", UserController.userLogin);
 
-router.get("/user", AuthMiddleware, UserController.userProfile);
+router.get("/user/:userId", UserController.userProfile);
 router.put(
   "/user",
   AuthMiddleware,

@@ -102,11 +102,17 @@ const UserController = {
 
   userProfile: async (req, res) => {
     try {
-      const _id = req.userId;
+      const { userId } = req.params;
 
-      const user = await User.findOne({ _id })
+      const user = await User.findById(userId)
         .select("-password")
-        .populate("stories");
+        .populate("stories")
+        .populate({
+          path: "contributions",
+          populate: {
+            path: "votes",
+          },
+        });
       if (!user || !user.isActive) {
         return res.status(404).json({
           message: "User not found",
