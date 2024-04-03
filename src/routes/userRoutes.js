@@ -14,6 +14,7 @@ router.post(
 router.post("/login", UserController.userLogin);
 
 router.get("/user/:userId", UserController.userProfile);
+router.get("/user", AuthMiddleware, UserController.loggedInUserProfile);
 router.put(
   "/user",
   AuthMiddleware,

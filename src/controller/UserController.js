@@ -100,6 +100,42 @@ const UserController = {
     }
   },
 
+  loggedInUserProfile: async (req, res) => {
+    try {
+      const { userId } = req;
+
+      const user = await User.findById(userId)
+        .select("-password")
+        .populate("stories")
+        .populate({
+          path: "contributions",
+          populate: [
+            {
+              path: "storyFor",
+              select: "title, content",
+            },
+            {
+              path: "votes",
+              select: "name username",
+            },
+          ],
+        });
+
+      if (!user) {
+        return res.status(404).json({
+          message: "User not found",
+        });
+      }
+
+      res.status(200).json(user);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        message: "Internal server error",
+      });
+    }
+  },
+
   userProfile: async (req, res) => {
     try {
       const { userId } = req.params;
@@ -109,9 +145,20 @@ const UserController = {
         .populate("stories")
         .populate({
           path: "contributions",
-          populate: {
-            path: "votes",
-          },
+          populate: [
+            {
+              path: "storyFor",
+              select: "title, content",
+            },
+            {
+              path: "author",
+              select: "name username",
+            },
+            {
+              path: "votes",
+              select: "name username",
+            },
+          ],
         });
       if (!user || !user.isActive) {
         return res.status(404).json({
