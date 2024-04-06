@@ -60,7 +60,7 @@ const UserController = {
         }
 
         const newUser = new User({
-          profileImage: uploadedImage.secure_url,
+          profileImage: null || uploadedImage.secure_url,
           name,
           username,
           email,
