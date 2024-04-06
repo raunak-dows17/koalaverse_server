@@ -41,21 +41,23 @@ const UserController = {
         }
         const hashedPassword = await bcrypt.hash(password, 7);
 
-        const imageBuffer = req.file.buffer;
-        const uploadOptions = {
-          folder: "tv_profileImages",
-          public_id: username,
-        };
-        const uploadedImage = await new Promise((resolve, reject) => {
-          const uploadStream = cloudinary.uploader.upload_stream(
-            uploadOptions,
-            (error, result) => {
-              if (error) throw new Error(error);
-              else return resolve(result);
-            }
-          );
-          streamify.createReadStream(imageBuffer).pipe(uploadStream);
-        });
+        if (req.file.buffer) {
+          const imageBuffer = req.file.buffer;
+          const uploadOptions = {
+            folder: "tv_profileImages",
+            public_id: username,
+          };
+          const uploadedImage = await new Promise((resolve, reject) => {
+            const uploadStream = cloudinary.uploader.upload_stream(
+              uploadOptions,
+              (error, result) => {
+                if (error) throw new Error(error);
+                else return resolve(result);
+              }
+            );
+            streamify.createReadStream(imageBuffer).pipe(uploadStream);
+          });
+        }
 
         const newUser = new User({
           profileImage: uploadedImage.secure_url,
