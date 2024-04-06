@@ -41,13 +41,14 @@ const UserController = {
         }
         const hashedPassword = await bcrypt.hash(password, 7);
 
+        let uploadedImage;
         if (req.file.buffer) {
           const imageBuffer = req.file.buffer;
           const uploadOptions = {
             folder: "tv_profileImages",
             public_id: username,
           };
-          const uploadedImage = await new Promise((resolve, reject) => {
+          uploadedImage = await new Promise((resolve, reject) => {
             const uploadStream = cloudinary.uploader.upload_stream(
               uploadOptions,
               (error, result) => {
@@ -60,7 +61,7 @@ const UserController = {
         }
 
         const newUser = new User({
-          profileImage: null || uploadedImage.secure_url,
+          profileImage: null || uploadedImage?.secure_url,
           name,
           username,
           email,
