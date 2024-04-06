@@ -179,7 +179,7 @@ const UserController = {
     try {
       const { username } = req.query;
       const user = await User.findOne({ username });
-      if (user.username) {
+      if (user) {
         return res.json({
           message: "Username already taken",
         });
