@@ -98,7 +98,7 @@ const UserController = {
           message: "User not found",
         });
       } else {
-        if (!this.checkUsername) {
+        if (!username) {
           return res.status(401).json({
             message: "Username is required",
           });
