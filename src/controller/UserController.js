@@ -42,7 +42,7 @@ const UserController = {
         const hashedPassword = await bcrypt.hash(password, 7);
 
         let uploadedImage;
-        if (req.file.buffer) {
+        if (req.file) {
           const imageBuffer = req.file.buffer;
           const uploadOptions = {
             folder: "tv_profileImages",
@@ -61,7 +61,7 @@ const UserController = {
         }
 
         const newUser = new User({
-          profileImage: null || uploadedImage?.secure_url,
+          profileImage: uploadedImage?.secure_url,
           name,
           username,
           email,
