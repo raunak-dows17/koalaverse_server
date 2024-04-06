@@ -14,6 +14,31 @@ const UserController = {
       if (existingEmail || existingUsername) {
         return res.status(401).send("User already exists");
       } else {
+        if (!name) {
+          return res.status(401).json({
+            message: "Name is required",
+          });
+        }
+        if (!username) {
+          return res.status(401).json({
+            message: "Username is required",
+          });
+        }
+        if (!email) {
+          return res.status(401).json({
+            message: "Email is required",
+          });
+        }
+        if (!phoneNumber) {
+          return res.status(401).json({
+            message: "Phone Number is required",
+          });
+        }
+        if (!password) {
+          return res.status(401).json({
+            message: "Password is required",
+          });
+        }
         const hashedPassword = await bcrypt.hash(password, 7);
 
         const imageBuffer = req.file.buffer;
@@ -70,6 +95,16 @@ const UserController = {
           message: "User not found",
         });
       } else {
+        if (!this.checkUsername) {
+          return res.status(401).json({
+            message: "Username is required",
+          });
+        }
+        if (!password) {
+          return res.status(401).json({
+            message: "Password is required",
+          });
+        }
         const matchPassword = await bcrypt.compare(password, user.password);
 
         if (!matchPassword) {
