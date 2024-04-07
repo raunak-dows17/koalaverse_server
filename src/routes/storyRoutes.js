@@ -3,8 +3,8 @@ const AuthMiddleware = require("../middleware/AuthMiddleware");
 
 const router = require("express").Router();
 
-router.get("/", StoryController.getStroies);
-router.get("/:_id", StoryController.getStroiesById);
+router.get("/", AuthMiddleware, StoryController.getStroies);
+router.get("/:_id", AuthMiddleware, StoryController.getStroiesById);
 router.post("/", AuthMiddleware, StoryController.postStory);
 router.put(
   "/markascomplete/:storyId",

@@ -3,7 +3,11 @@ const AuthMiddleware = require("../middleware/AuthMiddleware");
 
 const router = require("express").Router();
 
-router.get("/:contributionId", ContributionController.getContributionById);
+router.get(
+  "/:contributionId",
+  AuthMiddleware,
+  ContributionController.getContributionById
+);
 router.post("/:storyId", AuthMiddleware, ContributionController.contribute);
 router.put(
   "/:contributionId",
