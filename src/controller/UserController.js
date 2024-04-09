@@ -144,7 +144,15 @@ const UserController = {
 
       const user = await User.findById(userId)
         .select("-password")
-        .populate("stories")
+        .populate({
+          path: "stories",
+          populate: [
+            {
+              path: "author",
+              select: "name username profileImage",
+            },
+          ],
+        })
         .populate({
           path: "contributions",
           populate: [
@@ -180,7 +188,15 @@ const UserController = {
 
       const user = await User.findOne({ username })
         .select("-password")
-        .populate("stories")
+        .populate({
+          path: "stories",
+          populate: [
+            {
+              path: "author",
+              select: "name username profileImage",
+            },
+          ],
+        })
         .populate({
           path: "contributions",
           populate: [
@@ -190,7 +206,7 @@ const UserController = {
             },
             {
               path: "author",
-              select: "name username -_id",
+              select: "name username",
             },
             {
               path: "votes",
