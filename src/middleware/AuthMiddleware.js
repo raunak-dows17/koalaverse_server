@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 function AuthMiddleware(req, res, next) {
   const token = req.header("token");
   if (!token) {
-    return res.status(401).json({
+    return res.status(403).json({
       error: "Token is required!!!",
     });
   }
@@ -13,7 +13,7 @@ function AuthMiddleware(req, res, next) {
     next();
   } catch (error) {
     console.error(error?.message);
-    res.status(401).json({
+    res.status(403).json({
       error: "Access Denied",
     });
   }

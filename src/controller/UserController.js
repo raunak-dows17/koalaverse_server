@@ -176,9 +176,9 @@ const UserController = {
 
   userProfile: async (req, res) => {
     try {
-      const { userId } = req.params;
+      const { username } = req.params;
 
-      const user = await User.findById(userId)
+      const user = await User.findOne({ username })
         .select("-password")
         .populate("stories")
         .populate({
@@ -190,7 +190,7 @@ const UserController = {
             },
             {
               path: "author",
-              select: "name username",
+              select: "name username -_id",
             },
             {
               path: "votes",
