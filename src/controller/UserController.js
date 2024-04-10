@@ -151,6 +151,19 @@ const UserController = {
               path: "author",
               select: "name username profileImage",
             },
+            {
+              path: "contributions",
+              populate: [
+                {
+                  path: "storyFor",
+                  select: "title, content",
+                },
+                {
+                  path: "votes",
+                  select: "name username",
+                },
+              ],
+            },
           ],
         })
         .populate({
@@ -194,6 +207,19 @@ const UserController = {
             {
               path: "author",
               select: "name username profileImage",
+            },
+            {
+              path: "contributions",
+              populate: [
+                {
+                  path: "author",
+                  select: "name username profileImage",
+                },
+                {
+                  path: "votes",
+                  select: "name username",
+                },
+              ],
             },
           ],
         })
