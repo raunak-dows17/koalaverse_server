@@ -172,6 +172,7 @@ const StoryController = {
         await contribution.save();
       } else {
         story.content.push({
+          _id: contribution._id,
           text: contribution.content,
           author: contribution.author,
           createdAt: contribution.createdAt,
