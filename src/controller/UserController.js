@@ -316,28 +316,40 @@ const UserController = {
         if (user?.profileImage) {
           await cloudinary.api.delete_resources(`tv_profileImages/${_id}`);
         }
-        const imageBuffer = req.file.buffer;
-        const uploadOptions = {
-          folder: "tv_profileImages",
-          public_id: user?.username,
-        };
-        const uploadedImage = await new Promise((resolve, reject) => {
-          const uploadStream = cloudinary.uploader.upload_stream(
-            uploadOptions,
-            (error, result) => {
-              if (error) throw new Error(error);
-              else return resolve(result);
-            }
-          );
-          streamify.createReadStream(imageBuffer).pipe(uploadStream);
-        });
+        if (req.file) {
+          const imageBuffer = req.file.buffer;
+          const uploadOptions = {
+            folder: "tv_profileImages",
+            public_id: user?.username,
+          };
+          const uploadedImage = await new Promise((resolve, reject) => {
+            const uploadStream = cloudinary.uploader.upload_stream(
+              uploadOptions,
+              (error, result) => {
+                if (error) throw new Error(error);
+                else return resolve(result);
+              }
+            );
+            streamify.createReadStream(imageBuffer).pipe(uploadStream);
+          });
 
-        const profileImage = uploadedImage.secure_url;
+          const profileImage = uploadedImage?.secure_url;
+
+          const updatedUser = {
+            name: name || user.name,
+            profileImage: profileImage || user.profileImage,
+            phoneNumber: phoneNumber || user.phoneNumber,
+          };
+
+          await User.findByIdAndUpdate(_id, updatedUser);
+          return res.status(201).json({
+            message: "User updated successfully",
+          });
+        }
 
         const updatedUser = {
-          name: name ? name : user.name,
-          profileImage: profileImage ? profileImage : user.profileImage,
-          phoneNumber: phoneNumber ? phoneNumber : user.phoneNumber,
+          name: name || user.name,
+          phoneNumber: phoneNumber || user.phoneNumber,
         };
 
         await User.findByIdAndUpdate(_id, updatedUser);
