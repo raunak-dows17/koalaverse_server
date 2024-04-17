@@ -229,7 +229,12 @@ const ContributionController = {
       return res.status(200).json({
         message: "Contribution deleted successfully",
       });
-    } catch (error) {}
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({
+        message: "Internal server error",
+      });
+    }
   },
 };
 
