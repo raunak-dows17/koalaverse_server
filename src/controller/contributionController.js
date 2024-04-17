@@ -200,9 +200,7 @@ const ContributionController = {
 
       const user = await User.findById(userId);
       const contribution = await Contributions.findById(contributionId);
-      const story = await Contributions.findById(contribution.storyFor);
-
-      console.log(story);
+      const story = await Story.findById(contribution.storyFor);
 
       if (!user) {
         return res.status(404).json({
@@ -223,8 +221,8 @@ const ContributionController = {
       }
 
       await Contributions.findByIdAndDelete(contributionId);
-      user.contributions.pop(contributionId);
-      story.contributions.pop(contributionId);
+      await user.contributions.pop(contributionId);
+      await story.contributions.pop(contributionId);
 
       return res.status(200).json({
         message: "Contribution deleted successfully",
