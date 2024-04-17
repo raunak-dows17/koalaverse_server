@@ -281,7 +281,7 @@ const StoryController = {
         });
       }
 
-      if (story.author !== userId) {
+      if (String(story.author) !== String(userId)) {
         return res.status(403).json({
           message: "You are not authorized mark as complete on this story",
         });
