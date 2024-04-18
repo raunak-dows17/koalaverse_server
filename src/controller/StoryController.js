@@ -233,10 +233,7 @@ const StoryController = {
 
         updatedContent = content.map((item, index) => ({
           text: item.text,
-          author:
-            existingContent[index].author === null
-              ? existingContent[index].author
-              : userId,
+          author: item.author,
         }));
       } else {
         return res.status(400).json({
