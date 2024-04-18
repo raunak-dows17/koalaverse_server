@@ -175,7 +175,7 @@ const UserController = {
             },
             {
               path: "votes",
-              select: "name username",
+              select: "name username, profileImage",
             },
           ],
         });
@@ -217,7 +217,7 @@ const UserController = {
                 },
                 {
                   path: "votes",
-                  select: "name username",
+                  select: "name username profileImage",
                 },
               ],
             },
