@@ -294,8 +294,8 @@ const StoryController = {
 
       return res.status(200).json({
         message: story.isCompleted
-          ? "marked as uncompleted successfully"
-          : "marked as completed successfully",
+          ? "marked as completed successfully"
+          : "marked as uncompleted successfully",
       });
     } catch (error) {
       console.error(error);
