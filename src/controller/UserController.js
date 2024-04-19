@@ -162,6 +162,10 @@ const UserController = {
                   path: "votes",
                   select: "name username profileImage",
                 },
+                {
+                  path: "author",
+                  select: "name username profileImage",
+                },
               ],
             },
           ],
